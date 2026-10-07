@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv/
+venv/
+matches_input.txt
+*.log
+.DS_Store
+playwright-report/
+test-results/

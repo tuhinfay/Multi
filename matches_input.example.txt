@@ -1,0 +1,9 @@
+# Format: Match Name | Market
+# One match per line
+# Lines starting with # are comments
+
+Manchester City vs Arsenal | W1
+Real Madrid vs Barcelona | BTTS Yes
+Bayern Munich vs Dortmund | Over 2.5
+Liverpool vs Chelsea | Double Chance 1X
+PSG vs Marseille | Under 3.5
