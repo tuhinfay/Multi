@@ -1,9 +1,29 @@
-# Format: Match Name | Market
-# One match per line
-# Lines starting with # are comments
+1. Europe. UEFA Nations League
+Germany vs Serbia
+02.10.2026 (12:45 am)
+Prediction: Regular time, 1X2: W1 (Odds: 1.22)
 
-Manchester City vs Arsenal | W1
-Real Madrid vs Barcelona | BTTS Yes
-Bayern Munich vs Dortmund | Over 2.5
-Liverpool vs Chelsea | Double Chance 1X
-PSG vs Marseille | Under 3.5
+2. Europe. UEFA Nations League
+Greece vs Netherlands
+02.10.2026 (12:45 am)
+Prediction: Shots On Target, 1X2: W2 (Odds: 1.65)
+
+3. Europe. UEFA Nations League
+Denmark vs Portugal
+02.10.2026 (12:45 am)
+Prediction: Yellow Cards, Total 1: (1.5) Over (Odds: 1.79)
+
+4. Europe. UEFA Nations League
+Wales vs Norway
+02.10.2026 (12:45 am)
+Prediction: Regular time, 1X2: W2 (Odds: 1.432)
+
+5. Colombia. Primera A
+Internacional de Bogota vs Once Caldas
+02.10.2026 (07:00 am)
+Prediction: Regular time, Double Chance: 2X (Odds: 1.37)
+
+6. Club Friendly (Women)
+Austria Wien (Women) vs Internazionale Milano (Women)
+01.10.2026 (10:45 pm)
+Prediction: Regular time, Double Chance + Both Teams To Score: 2X And Both To Score - Yes (Odds: 2.17)

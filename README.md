@@ -4,73 +4,93 @@ Free tool to help build accumulator (multi) bets on 1xBet.
 
 **No paid API. No paid service.**
 
-## What it does
+## New Easy Input Format (Recommended)
 
-1. You give a list of matches + desired market (example: W1, BTTS Yes, Over 2.5, Double Chance 2X, etc.)
-2. The tool tries to find those matches on 1xBet
-3. It selects the odds one by one
-4. Tries to generate / show the accumulator coupon code
+Just paste the full prediction list like this:
 
-## Important Reality Check
+```
+1. Europe. UEFA Nations League
+Germany vs Serbia
+02.10.2026 (12:45 am)
+Prediction: Regular time, 1X2: W1 (Odds: 1.22)
 
-1xBet uses strong anti-bot protection (Cloudflare + dynamic JS).  
-Fully automatic free scraping + clicking is **very unstable** and often fails.
+2. Europe. UEFA Nations League
+Greece vs Netherlands
+02.10.2026 (12:45 am)
+Prediction: Shots On Target, 1X2: W2 (Odds: 1.65)
 
-This project has **two modes**:
+3. Europe. UEFA Nations League
+Denmark vs Portugal
+02.10.2026 (12:45 am)
+Prediction: Yellow Cards, Total 1: (1.5) Over (Odds: 1.79)
 
-### Mode 1: Assisted (Recommended - Most Reliable)
-- You paste match list + markets
-- Tool generates a clean checklist
-- You open 1xBet and select quickly following the checklist
-- Much faster and works every day
+4. Europe. UEFA Nations League
+Wales vs Norway
+02.10.2026 (12:45 am)
+Prediction: Regular time, 1X2: W2 (Odds: 1.432)
 
-### Mode 2: Auto Attempt (Playwright)
-- Tries to open 1xBet and click automatically
-- May work sometimes, may get blocked
-- Needs local browser
+5. Colombia. Primera A
+Internacional de Bogota vs Once Caldas
+02.10.2026 (07:00 am)
+Prediction: Regular time, Double Chance: 2X (Odds: 1.37)
 
-## How to use (Assisted Mode - Recommended)
+6. Club Friendly (Women)
+Austria Wien (Women) vs Internazionale Milano (Women)
+01.10.2026 (10:45 pm)
+Prediction: Regular time, Double Chance + Both Teams To Score: 2X And Both To Score - Yes (Odds: 2.17)
+```
 
-1. Copy `matches_input.example.txt` → rename to `matches_input.txt`
-2. Edit the file with your matches and markets
+### How matching works
+- First tries exact **Team vs Team** name
+- If not perfect → uses **Date** to confirm the correct match
+- League / Country helps reduce wrong selection
+
+## How to use
+
+1. Copy the example file:
+```bash
+cp matches_input.example.txt matches_input.txt
+```
+
+2. Paste your full list into `matches_input.txt`
+
 3. Run:
-
 ```bash
 pip install -r requirements.txt
 python multi.py
 ```
 
-### Input Format (`matches_input.txt`)
+It will show a clean checklist with:
+- League
+- Teams
+- Date & Time
+- Exact market to select
+- Odds
 
-```
-Team A vs Team B | W1
-Team C vs Team D | BTTS Yes
-Team E vs Team F | Over 2.5
-Team G vs Team H | Double Chance 2X
-```
+Then you just open 1xBet and follow the checklist quickly.
 
-Supported market keywords (case insensitive):
-- `W1` / `1` / `Home`
-- `W2` / `2` / `Away`
-- `X` / `Draw`
-- `1X` / `12` / `X2` (Double Chance)
-- `BTTS Yes` / `BTTS No` / `GG` / `NG`
-- `Over 2.5` / `Under 2.5` / `Over 1.5` / `Under 1.5` / `Over 3.5` etc.
-- Any other market text will be searched as-is
-
-## How to use (Auto Mode)
-
+### Auto mode (experimental)
 ```bash
 python multi.py --auto
 ```
 
-## Requirements
+## Supported Markets (examples)
 
-- Python 3.10+
+- Regular time, 1X2: W1 / W2 / X
+- Double Chance: 1X / 12 / 2X
+- Both Teams To Score: Yes / No
+- Double Chance + BTTS combinations
+- Total Over/Under (1.5, 2.5, 3.5...)
+- Yellow Cards Total
+- Shots On Target 1X2
+- Asian Handicap
+- Any other text you write will be shown as-is
+
+## Requirements
 
 ```bash
 pip install -r requirements.txt
-playwright install chromium
+playwright install chromium   # only needed for --auto
 ```
 
 ## Disclaimer
