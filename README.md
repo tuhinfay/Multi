@@ -1,67 +1,46 @@
 # Multi - 1xBet Accumulator Helper (Free)
 
-Free tool to help build accumulator (multi) bets on 1xBet and get the **Save Code / Coupon Code**.
+Local tool to help build accumulator and get **Event code** (Save/load events → Save) like `9B93C`.
 
-**No paid API.**
+Works with **bd.1xbet.com** flow shown in real usage.
 
-## Two Modes
+## How the code is generated (from real site)
 
-### 1. Assisted Mode (Recommended & Reliable)
-```bash
-python multi.py
-```
-Gives clean checklist → you select fast on 1xBet → click **Share / Save Code**.
+1. Add matches + markets to **Bet Slip** (Accumulator)
+2. Click **Save/load events** (right side of bet slip)
+3. Click green **Save**
+4. Short **Event code** appears (e.g. `9B93C`)
 
-### 2. Auto Mode (Best Effort)
-```bash
-python multi.py --auto
-```
-- Opens real Chrome browser (visible)
-- Tries to search each match
-- Waits so you can click the market if needed
-- Keeps browser open so you can go to Bet Slip → **Share / Save Code** and copy it
+## Usage (Windows CMD)
 
-> 1xBet has strong anti-bot. Full 100% automatic is hard.  
-> This mode helps as much as possible + lets you finish easily.
+```cmd
+cd %USERPROFILE%\Desktop
+git clone https://github.com/tuhinfay/Multi.git
+cd Multi
 
-## Input Format (Easy)
-
-Paste like this in `matches_input.txt`:
-
-```
-1. Europe. UEFA Nations League
-Germany vs Serbia
-02.10.2026 (12:45 am)
-Prediction: Regular time, 1X2: W1 (Odds: 1.22)
-
-2. Europe. UEFA Nations League
-Greece vs Netherlands
-02.10.2026 (12:45 am)
-Prediction: Shots On Target, 1X2: W2 (Odds: 1.65)
-```
-
-## How to run
-
-```bash
 pip install -r requirements.txt
 playwright install chromium
 
-# Checklist only
-python multi.py
+copy matches_input.example.txt matches_input.txt
+notepad matches_input.txt
 
-# Auto attempt (browser opens)
 python multi.py --auto
 ```
 
-## Tips for higher success
+## Modes
 
-1. First time run `--auto` and stay near the browser
-2. If captcha / block appears → solve it manually
-3. After all matches added → Bet Slip → Share / Save Code
-4. Copy the code
+| Command | What it does |
+|---------|--------------|
+| `python multi.py` | Clean checklist only |
+| `python multi.py --auto` | Opens browser, helps select matches, tries Save/load events + reads code |
+
+## Notes
+
+- Browser stays open so you can click markets / finish if script misses something
+- Login not required for Save/load events (works as guest on many 1xBet domains)
+- If search or market click fails → just click manually, script continues
+- Final code appears in the Event code box after Save
 
 ## Disclaimer
 
-- Personal educational use
-- Respect 1xBet Terms
-- Bet responsibly
+Personal use. Respect 1xBet Terms. Bet responsibly.
