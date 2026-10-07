@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 venv/
 matches_input.txt
+output/
 *.log
 .DS_Store
 playwright-report/
