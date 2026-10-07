@@ -2,7 +2,7 @@
 """
 Multi - 1xBet Accumulator Helper (Free)
 Local auto mode: add matches to Bet Slip, click Save/load events, try to get Event code.
-Based on real flow from bd.1xbet.com (Save/load events → Save → code like 9B93C)
+Browser starts minimized so you can do other work.
 """
 
 import argparse
@@ -142,14 +142,10 @@ def print_checklist(selections: List[MatchSelection]):
 
 def try_auto_mode(selections: List[MatchSelection]):
     print("\n" + "=" * 70)
-    print("  LOCAL AUTO MODE (bd.1xbet.com style)")
+    print("  LOCAL AUTO MODE (minimized browser)")
     print("=" * 70)
-    print("Goal:")
-    print("  1. Open 1xBet")
-    print("  2. Help you add matches to Bet Slip (Accumulator)")
-    print("  3. Click Save/load events → Save")
-    print("  4. Try to read the Event code (like 9B93C)")
-    print("Browser stays open. You can click markets if needed.")
+    print("Browser will open then minimize.")
+    print("You can do other work. Script continues in background.")
     print("=" * 70 + "\n")
 
     try:
@@ -181,7 +177,6 @@ def try_auto_mode(selections: List[MatchSelection]):
 
         page = context.new_page()
 
-        # Prefer Bangladesh domain (from your video)
         urls = [
             "https://bd.1xbet.com/en",
             "https://bd.1xbet.com/en/line",
@@ -194,7 +189,7 @@ def try_auto_mode(selections: List[MatchSelection]):
             try:
                 print(f"[+] Opening {url}")
                 page.goto(url, timeout=60000, wait_until="domcontentloaded")
-                time.sleep(4)
+                time.sleep(3)
                 opened = True
                 print("[+] Page loaded")
                 break
@@ -207,8 +202,22 @@ def try_auto_mode(selections: List[MatchSelection]):
             browser.close()
             return
 
-        print("\n[!] If any popup/captcha appears → close/solve it manually.")
-        print("[!] Script will now go through each match.\n")
+        # Minimize the browser window so user can work on other things
+        try:
+            page.evaluate("window.moveTo(0, 0)")
+            # Use CDP to minimize
+            client = page.context.new_cdp_session(page)
+            # Get window ID and minimize
+            window = client.send("Browser.getWindowForTarget")
+            client.send("Browser.setWindowBounds", {
+                "windowId": window["windowId"],
+                "bounds": {"windowState": "minimized"}
+            })
+            print("[+] Browser minimized. You can do other work now.\n")
+        except Exception as e:
+            print(f"[!] Could not auto-minimize (you can minimize manually): {e}\n")
+
+        print("[!] If captcha/popup appears, restore browser and solve it.\n")
 
         for idx, s in enumerate(selections, 1):
             print(f"\n========== [{idx}/{len(selections)}] {s.teams} ==========")
@@ -217,7 +226,6 @@ def try_auto_mode(selections: List[MatchSelection]):
             print(f"Search : {s.search_query}")
 
             try:
-                # Search box selectors (common on 1xBet)
                 search_box = None
                 for sel in [
                     "input[placeholder*='Search']",
@@ -247,36 +255,33 @@ def try_auto_mode(selections: List[MatchSelection]):
                     print("    → Search submitted")
                     time.sleep(3)
                 else:
-                    print("    [!] Search box not found automatically")
-                    print(f"    → Please search manually for: {s.teams}")
-                    print("    Waiting 15 seconds for you...")
+                    print("    [!] Search box not found")
+                    print(f"    → Restore browser and search: {s.teams}")
+                    print("    Waiting 15 seconds...")
                     time.sleep(15)
 
-                print(f"    → Click the correct market: {s.market_clean}")
-                print("    Waiting 12 seconds (you can click if needed)...")
+                print(f"    → Need market: {s.market_clean}")
+                print("    Waiting 12 seconds (restore & click if needed)...")
                 time.sleep(12)
 
             except Exception as e:
                 print(f"    Error: {e}")
                 time.sleep(3)
 
-        # ========== After all matches: try Save/load events ==========
+        # Try Save/load events
         print("\n" + "=" * 70)
         print("  TRYING TO GENERATE EVENT CODE")
         print("=" * 70)
-        print("Looking for 'Save/load events' button (as in your video)...")
 
         code_found = None
 
         try:
-            # Click "Save/load events"
             save_load_clicked = False
             for sel in [
                 "text=Save/load events",
                 "text=Save/load",
                 "text=Save / load events",
                 "a:has-text('Save/load')",
-                "[class*='save']",
                 "text=Save",
             ]:
                 try:
@@ -294,19 +299,16 @@ def try_auto_mode(selections: List[MatchSelection]):
 
             if not save_load_clicked:
                 print("[!] Could not auto-click 'Save/load events'")
-                print("    → Please click it yourself on the Bet Slip (right side)")
-                print("    Waiting 20 seconds...")
-                time.sleep(20)
+                print("    → Restore browser and click it on Bet Slip")
+                print("    Waiting 25 seconds...")
+                time.sleep(25)
 
-            # Now try to click the green Save button and read the code
             time.sleep(1)
 
-            # Look for Event code input or the generated code
             for sel in [
                 "input[placeholder*='code']",
                 "input[placeholder*='Code']",
                 "input[placeholder*='Event']",
-                ".event-code input",
                 "input[type='text']",
             ]:
                 try:
@@ -314,34 +316,30 @@ def try_auto_mode(selections: List[MatchSelection]):
                     for inp in inputs:
                         if inp.is_visible():
                             val = inp.input_value()
-                            if val and len(val) >= 4 and len(val) <= 12:
+                            if val and 4 <= len(val) <= 12:
                                 code_found = val.strip()
-                                print(f"[+] Found code in input: {code_found}")
+                                print(f"[+] Found code: {code_found}")
                                 break
                     if code_found:
                         break
                 except:
                     pass
 
-            # Try clicking Save button if code not yet there
             if not code_found:
                 for sel in [
                     "button:has-text('Save')",
                     "text=Save",
-                    "button.green",
-                    "[class*='save'] button",
                 ]:
                     try:
                         btn = page.query_selector(sel)
                         if btn and btn.is_visible():
                             btn.click()
-                            print("[+] Clicked Save button")
+                            print("[+] Clicked Save")
                             time.sleep(2)
                             break
                     except:
                         pass
 
-                # Re-check input after Save
                 time.sleep(1)
                 for sel in [
                     "input[placeholder*='code']",
@@ -354,7 +352,7 @@ def try_auto_mode(selections: List[MatchSelection]):
                         for inp in inputs:
                             if inp.is_visible():
                                 val = inp.input_value()
-                                if val and len(val) >= 4 and len(val) <= 12:
+                                if val and 4 <= len(val) <= 12:
                                     code_found = val.strip()
                                     print(f"[+] Code after Save: {code_found}")
                                     break
@@ -364,24 +362,30 @@ def try_auto_mode(selections: List[MatchSelection]):
                         pass
 
         except Exception as e:
-            print(f"[!] Error while trying to save: {e}")
+            print(f"[!] Error: {e}")
 
         print("\n" + "=" * 70)
         if code_found:
             print(f"  SUCCESS! Event code: {code_found}")
+            # Also save to file
+            try:
+                from datetime import datetime
+                ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                out = Path(f"event_code_{ts}.txt")
+                out.write_text(f"Event Code: {code_found}\nTime: {ts}\n", encoding="utf-8")
+                print(f"  Saved to: {out}")
+            except:
+                pass
         else:
             print("  Code not auto-detected")
-            print("  Please do this manually:")
-            print("  1. Check Bet Slip has all your selections (Accumulator)")
-            print("  2. Click 'Save/load events'")
-            print("  3. Click green 'Save' button")
-            print("  4. Copy the Event code (e.g. 9B93C)")
+            print("  Restore browser → Bet Slip → Save/load events → Save → copy code")
         print("=" * 70)
-        print("\nBrowser will stay open 5 minutes so you can finish & copy code.")
-        print("Press Ctrl+C in terminal when done.\n")
+        print("\nBrowser stays open 5 more minutes (minimized).")
+        print("Restore it anytime to check / copy code.")
+        print("Ctrl+C in terminal when finished.\n")
 
         try:
-            page.wait_for_timeout(300000)  # 5 minutes
+            page.wait_for_timeout(300000)
         except KeyboardInterrupt:
             pass
 
@@ -391,7 +395,7 @@ def try_auto_mode(selections: List[MatchSelection]):
 
 def main():
     parser = argparse.ArgumentParser(description="Multi - 1xBet Accumulator Helper")
-    parser.add_argument("--auto", action="store_true", help="Local full selection + Save code attempt")
+    parser.add_argument("--auto", action="store_true", help="Local full selection + Save code (minimized)")
     parser.add_argument("--input", default=str(INPUT_FILE))
     args = parser.parse_args()
 
@@ -415,7 +419,7 @@ def main():
         try_auto_mode(selections)
     else:
         print_checklist(selections)
-        print("\nTo try full auto on local PC (bd.1xbet.com style):")
+        print("\nTo run auto (browser minimizes):")
         print("  python multi.py --auto")
 
 
