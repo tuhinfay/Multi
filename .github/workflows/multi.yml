@@ -1,0 +1,62 @@
+name: Multi Accumulator Checklist
+
+on:
+  workflow_dispatch:
+    inputs:
+      use_example:
+        description: "Use example list? (true/false)"
+        required: false
+        default: "true"
+        type: boolean
+
+jobs:
+  generate-checklist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare input
+        run: |
+          if [ "${{ inputs.use_example }}" = "true" ] || [ ! -f matches_input.txt ]; then
+            echo "Using example list..."
+            cp matches_input.example.txt matches_input.txt
+          else
+            echo "Using custom matches_input.txt"
+          fi
+          echo "----- INPUT -----"
+          cat matches_input.txt
+          echo "-----------------"
+
+      - name: Generate Checklist
+        id: checklist
+        run: |
+          echo "Running multi.py ..."
+          python multi.py | tee checklist_output.txt
+
+      - name: Upload Checklist Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-checklist
+          path: checklist_output.txt
+          retention-days: 5
+
+      - name: Summary
+        run: |
+          echo "### Multi Accumulator Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat checklist_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
